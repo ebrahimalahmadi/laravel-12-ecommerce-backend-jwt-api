@@ -10,3 +10,8 @@ use Illuminate\Support\Facades\Route;
 |
 |
 */
+
+// Test Route
+Route::get('test', function () {
+    return response()->json(['message' => 'API connected successfully']);
+});
