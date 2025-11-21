@@ -4,36 +4,12 @@ namespace App\Http\Controllers\Api\V1\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\Admin\LoginRequest;
-use App\Http\Requests\Api\V1\Auth\Admin\RegisterRequest;
 use App\Http\Resources\Api\V1\Admin\AdminResource;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    // Register new admin and return JWT token
-    public function register(RegisterRequest $request)
-    {
-        $data = $request->validated();
-        $data['password'] = Hash::make($data['password']);
-
-        $admin = Admin::create(attributes: $data);
-
-        $token = auth('admin')->login($admin);
-
-        return response()->json([
-            'status'       => true,
-            'code'         => 201,
-            'message'      => 'Admin registered successfully',
-            'token_type'   => 'bearer',
-            'access_token' => $token,
-            'expires_in'   => auth('admin')->factory()->getTTL() * 60,
-            'data'         => [
-                'admin' => new AdminResource($admin),
-            ],
-        ], 201);
-    }
-
     // Login admin and return JWT token
     public function login(LoginRequest $request)
     {

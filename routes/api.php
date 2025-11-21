@@ -42,7 +42,6 @@ Route::prefix('v1/auth')->group(function () {
 Route::prefix('v1/auth')->group(function () {
     // Admin Routes
     Route::prefix('admin')->group(function () {
-        Route::post('register', [AdminAuthController::class, 'register']);
         Route::post('login', [AdminAuthController::class, 'login']);
 
         Route::middleware(['auth:admin'])->group(function () {
