@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Api\V1\User\Auth\UserAuthController;
 use App\Http\Controllers\Api\V1\User\Auth\UserProfileController;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 // User Routes
 Route::prefix('v1/auth')->group(function () {
+
+
     // Authentication Routes
     Route::post('register', [UserAuthController::class, 'register']);
     Route::post('login', [UserAuthController::class, 'login']);
@@ -32,6 +35,20 @@ Route::prefix('v1/auth')->group(function () {
         Route::post('update-profile', [UserProfileController::class, 'update_profile']);
         Route::put('change-password', [UserProfileController::class, 'change_Password']);
         Route::delete('profile', [UserProfileController::class, 'delete_account']);
+    });
+});
+
+
+Route::prefix('v1/auth')->group(function () {
+    // Admin Routes
+    Route::prefix('admin')->group(function () {
+        Route::post('register', [AdminAuthController::class, 'register']);
+        Route::post('login', [AdminAuthController::class, 'login']);
+
+        Route::middleware(['auth:admin'])->group(function () {
+            Route::post('refresh', [AdminAuthController::class, 'refresh']);
+            Route::post('logout', [AdminAuthController::class, 'logout']);
+        });
     });
 });
 
