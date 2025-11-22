@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\Auth\AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\Auth\AdminProfileController;
 use App\Http\Controllers\Api\V1\User\Auth\UserAuthController;
 use App\Http\Controllers\Api\V1\User\Auth\UserProfileController;
 use Illuminate\Http\Request;
@@ -39,18 +40,26 @@ Route::prefix('v1/auth')->group(function () {
 });
 
 
-Route::prefix('v1/auth')->group(function () {
-    // Admin Routes
-    Route::prefix('admin')->group(function () {
-        Route::post('login', [AdminAuthController::class, 'login']);
+// Apply Middleware Alias for Admin Routes
+Route::middleware(['CheckIsAdmin'])->group(function () {
 
-        Route::middleware(['auth:admin'])->group(function () {
-            Route::post('refresh', [AdminAuthController::class, 'refresh']);
-            Route::post('logout', [AdminAuthController::class, 'logout']);
+    Route::prefix('v1/auth')->group(function () {
+        // Admin Routes
+        Route::prefix('admin')->group(function () {
+            Route::post('login', [AdminAuthController::class, 'login']);
+
+            Route::middleware(['auth:admin'])->group(function () {
+                Route::post('refresh', [AdminAuthController::class, 'refresh']);
+                Route::post('logout', [AdminAuthController::class, 'logout']);
+
+                Route::get('profile', [AdminProfileController::class, 'show_profile']);
+                Route::post('update-profile', [AdminProfileController::class, 'update_profile']);
+                Route::put('change-password', [AdminProfileController::class, 'change_password']);
+                Route::delete('profile', [AdminProfileController::class, 'delete_account']);
+            });
         });
     });
 });
-
 
 // Test Route
 Route::get('test', function () {
