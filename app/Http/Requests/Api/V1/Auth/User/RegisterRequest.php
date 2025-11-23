@@ -3,9 +3,21 @@
 namespace App\Http\Requests\Api\V1\Auth\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Helpers\ApiResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterRequest extends FormRequest
 {
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ApiResponse::validationError(errors: $validator->errors())
+        );
+    }
+
+
+
     /**
      * Determine if the user is authorized to make this request.
      */

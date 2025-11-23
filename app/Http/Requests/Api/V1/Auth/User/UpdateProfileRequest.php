@@ -2,10 +2,21 @@
 
 namespace App\Http\Requests\Api\V1\Auth\User;
 
+use App\Helpers\ApiResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateProfileRequest extends FormRequest
 {
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ApiResponse::validationError(errors: $validator->errors())
+        );
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,7 +39,7 @@ class UpdateProfileRequest extends FormRequest
             //         // التحقق من صحة رقم الجوال بالصيغة المطلوبة ان يبدا ب "+967" ويتكون من 9 أرقام
             // 'phone' => ['nullable', 'string', 'min:13', 'max:13', 'regex:/^\+967\d{9}$/', 'unique:users,phone,' . auth('user')->id()],
             'phone' => [
-                'nullable',
+                'sometimes',
                 'string',
                 'min:13',
                 'max:13',

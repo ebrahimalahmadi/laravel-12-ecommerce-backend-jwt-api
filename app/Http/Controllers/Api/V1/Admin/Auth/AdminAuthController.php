@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin\Auth;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\Admin\LoginRequest;
 use App\Http\Resources\Api\V1\Admin\AdminResource;
@@ -10,65 +11,74 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    // Login admin and return JWT token
+
+    /**
+     *  Admin Login (JWT)
+     */
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
+        try {
 
-        if (!$token = auth('admin')->attempt($credentials)) {
-            return response()->json([
-                'status'  => false,
-                'code'    => 401,
-                'message' => 'Invalid email or password',
-            ], 401);
+            $credentials = $request->only('email', 'password');
+
+            // If Wrong email or password
+            if (!$token = auth('admin')->attempt($credentials)) {
+                return ApiResponse::unauthorized('Invalid email or password');
+            }
+
+            $admin = auth('admin')->user();
+
+            return ApiResponse::success(
+                'Admin logged in successfully',
+                [
+                    'token_type'   => 'bearer',
+                    'access_token' => $token,
+                    'expires_in'   => auth('admin')->factory()->getTTL() * 60,
+                    'admin'        => new AdminResource($admin)
+                ]
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
         }
-
-        $admin = auth('admin')->user();
-
-        return response()->json([
-            'status'       => true,
-            'code'         => 200,
-            'message'      => 'Admin logged in successfully',
-            'token_type'   => 'bearer',
-            'access_token' => $token,
-            'expires_in'   => auth('admin')->factory()->getTTL() * 60,
-            'data'         => [
-                'admin' => new AdminResource($admin),
-            ],
-        ], 200);
     }
 
-    // Logout admin
+    /**
+     *  Logout Admin
+     */
     public function logout()
     {
-        auth('admin')->logout();
+        try {
+            auth('admin')->logout();
 
-        return response()->json([
-            'status'  => true,
-            'code'    => 200,
-            'message' => 'Admin logged out successfully',
-            'data'    => [
-                'admin' => null,
-            ],
-        ], 200);
+            return ApiResponse::success(
+                'Admin logged out successfully',
+                ['admin' => null]
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
-    // Refresh token
+    /**
+     *  Refresh Token
+     */
     public function refresh()
     {
-        $newToken = auth('admin')->refresh();
-        $admin = auth('admin')->user();
+        try {
+            $newToken = auth('admin')->refresh();
+            $admin = auth('admin')->user();
 
-        return response()->json([
-            'status'       => true,
-            'code'         => 200,
-            'message'      => 'Token refreshed successfully',
-            'token_type'   => 'bearer',
-            'access_token' => $newToken,
-            'expires_in'   => auth('admin')->factory()->getTTL() * 60,
-            'data'         => [
-                'admin' => new AdminResource($admin),
-            ],
-        ], 200);
+            return ApiResponse::success(
+                'Token refreshed successfully',
+                [
+                    'token_type'   => 'bearer',
+                    'access_token' => $newToken,
+                    'expires_in'   => auth('admin')->factory()->getTTL() * 60,
+                    'admin'        => new AdminResource($admin)
+                ]
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 }
