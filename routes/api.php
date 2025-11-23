@@ -40,13 +40,15 @@ Route::prefix('v1/auth')->group(function () {
 });
 
 
-// Apply Middleware Alias for Admin Routes
-Route::middleware(['CheckIsAdmin'])->group(function () {
 
-    Route::prefix('v1/auth')->group(function () {
-        // Admin Routes
-        Route::prefix('admin')->group(function () {
-            Route::post('login', [AdminAuthController::class, 'login']);
+Route::prefix('v1/auth')->group(function () {
+    // Admin Routes
+    Route::prefix('admin')->group(function () {
+        Route::post('login', [AdminAuthController::class, 'login']);
+
+
+        // Apply Middleware Alias for Admin Routes
+        Route::middleware(['CheckIsAdmin'])->group(function () {
 
             Route::middleware(['auth:admin'])->group(function () {
                 Route::post('refresh', [AdminAuthController::class, 'refresh']);

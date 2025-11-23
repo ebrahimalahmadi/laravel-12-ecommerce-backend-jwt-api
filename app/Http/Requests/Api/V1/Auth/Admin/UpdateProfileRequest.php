@@ -3,9 +3,20 @@
 namespace App\Http\Requests\Api\V1\Auth\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Helpers\ApiResponse;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateProfileRequest extends FormRequest
 {
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ApiResponse::validationError(errors: $validator->errors())
+        );
+    }
+
+
     /**
      * Determine if the user is authorized to make this request.
      */
