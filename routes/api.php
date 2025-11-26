@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\Auth\AdminProfileController;
+use App\Http\Controllers\Api\V1\Admin\User\UserManagementController;
 use App\Http\Controllers\Api\V1\User\Auth\UserAuthController;
 use App\Http\Controllers\Api\V1\User\Auth\UserProfileController;
 use Illuminate\Http\Request;
@@ -58,6 +59,24 @@ Route::prefix('v1/auth')->group(function () {
                 Route::post('update-profile', [AdminProfileController::class, 'update_profile']);
                 Route::put('change-password', [AdminProfileController::class, 'change_password']);
                 Route::delete('profile', [AdminProfileController::class, 'delete_account']);
+            });
+        });
+    });
+});
+
+
+// =====================
+//  Admin Mange Users Route
+// =====================
+
+Route::prefix('v1')->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::middleware(['auth:admin', 'CheckIsAdmin'])->group(function () {
+            Route::prefix('users')->group(function () {
+                Route::get('/', [UserManagementController::class, 'index']);
+                Route::get('/{user}', [UserManagementController::class, 'show']);
+                Route::put('/{user}', [UserManagementController::class, 'update']);
+                Route::delete('/{user}', [UserManagementController::class, 'destroy']);
             });
         });
     });
