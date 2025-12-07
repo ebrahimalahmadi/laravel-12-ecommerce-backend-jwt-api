@@ -3,20 +3,12 @@
 namespace App\Http\Requests\Api\V1\Auth\User;
 
 use App\Helpers\ApiResponse;
+use App\Http\Requests\Api\V1\Base\BaseRequest;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ChangePasswordRequest extends FormRequest
+// class ChangePasswordRequest extends FormRequest
+class ChangePasswordRequest extends BaseRequest
 {
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            ApiResponse::validationError(errors: $validator->errors())
-        );
-    }
-
     /**
      * Determine if the user is authorized to make this request.
      */

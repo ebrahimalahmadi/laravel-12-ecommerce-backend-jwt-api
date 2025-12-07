@@ -13,76 +13,71 @@ use Illuminate\Support\Facades\Route;
 | API Routes
 |--------------------------------------------------------------------------
 |  I change the gured from api to user
-
 |
 */
 
-// User Routes
-Route::prefix('v1/auth')->group(function () {
 
 
-    // Authentication Routes
-    Route::post('register', [UserAuthController::class, 'register']);
-    Route::post('login', [UserAuthController::class, 'login']);
+// ----------------------
+// User Authentication & Profile
+// ----------------------
+Route::prefix('v1/auth')->name('api.v1.auth.')->group(function () {
 
-    // Protected Routes
+    // Public Routes
+    Route::post('register', [UserAuthController::class, 'register'])->name('register');
+    Route::post('login', [UserAuthController::class, 'login'])->name('login');
+
+    // Protected Routes (User)
     Route::middleware(['auth:user'])->group(function () {
 
-        Route::post('refresh', [UserAuthController::class, 'refresh']);
-        Route::post('logout', [UserAuthController::class, 'logout']);
+        Route::post('refresh', [UserAuthController::class, 'refresh'])->name('refresh');
+        Route::post('logout', [UserAuthController::class, 'logout'])->name('logout');
 
-        Route::get('profile', [UserProfileController::class, 'show_profile']);
-        // ملاحظات مهمة
-        // HTTP Method: استخدمنا POST لأن المستخدم قد يرسل بيانات + صورة
-        Route::post('update-profile', [UserProfileController::class, 'update_profile']);
-        Route::put('change-password', [UserProfileController::class, 'change_Password']);
-        Route::delete('profile', [UserProfileController::class, 'delete_account']);
+        // Profile
+        Route::get('profile', [UserProfileController::class, 'show_profile'])->name('profile.show');
+        Route::post('update-profile', [UserProfileController::class, 'update_profile'])->name('profile.update');
+        Route::put('change-password', [UserProfileController::class, 'change_password'])->name('profile.password.update');
+        Route::delete('profile', [UserProfileController::class, 'delete_account'])->name('profile.delete');
     });
 });
 
+// ----------------------
+// Admin Authentication & Profile
+// ----------------------
+Route::prefix('v1/auth/admin')->name('api.v1.admin.auth.')->group(function () {
 
+    // Public Admin Login
+    Route::post('login', action: [AdminAuthController::class, 'login'])->name('login');
 
-Route::prefix('v1/auth')->group(function () {
-    // Admin Routes
-    Route::prefix('admin')->group(function () {
-        Route::post('login', [AdminAuthController::class, 'login']);
+    // Protected Admin Routes
+    Route::middleware(['auth:admin', 'CheckIsAdmin'])->group(function () {
+        Route::post('refresh', [AdminAuthController::class, 'refresh'])->name('refresh');
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
 
-
-        // Apply Middleware Alias for Admin Routes
-        Route::middleware(['CheckIsAdmin'])->group(function () {
-
-            Route::middleware(['auth:admin'])->group(function () {
-                Route::post('refresh', [AdminAuthController::class, 'refresh']);
-                Route::post('logout', [AdminAuthController::class, 'logout']);
-
-                Route::get('profile', [AdminProfileController::class, 'show_profile']);
-                Route::post('update-profile', [AdminProfileController::class, 'update_profile']);
-                Route::put('change-password', [AdminProfileController::class, 'change_password']);
-                Route::delete('profile', [AdminProfileController::class, 'delete_account']);
-            });
-        });
+        // Profile
+        Route::get('profile', [AdminProfileController::class, 'show_profile'])->name('profile.show');
+        Route::post('update-profile', [AdminProfileController::class, 'update_profile'])->name('profile.update');
+        Route::put('change-password', [AdminProfileController::class, 'change_password'])->name('profile.password.update');
+        Route::delete('profile', [AdminProfileController::class, 'delete_account'])->name('profile.delete');
     });
 });
 
+// ----------------------
+// Admin Manage Users
+// ----------------------
+Route::prefix('v1/admin')->name('api.v1.admin.')->middleware(['auth:admin', 'CheckIsAdmin'])->group(function () {
 
-// =====================
-//  Admin Mange Users Route
-// =====================
-
-Route::prefix('v1')->group(function () {
-    Route::prefix('admin')->group(function () {
-        Route::middleware(['auth:admin', 'CheckIsAdmin'])->group(function () {
-            Route::prefix('users')->group(function () {
-                Route::get('/', [UserManagementController::class, 'index']);
-                Route::get('/{user}', [UserManagementController::class, 'show']);
-                Route::put('/{user}', [UserManagementController::class, 'update']);
-                Route::delete('/{user}', [UserManagementController::class, 'destroy']);
-            });
-        });
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserManagementController::class, 'index'])->name('index');
+        Route::get('/{user}', [UserManagementController::class, 'show'])->name('show');
+        Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserManagementController::class, 'destroy'])->name('destroy');
     });
 });
 
+// ----------------------
 // Test Route
+// ----------------------
 Route::get('test', function () {
     return response()->json(['message' => 'API connected successfully']);
-});
+})->name('api.test');

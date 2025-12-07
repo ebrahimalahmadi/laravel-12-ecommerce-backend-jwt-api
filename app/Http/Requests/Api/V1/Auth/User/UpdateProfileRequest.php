@@ -2,21 +2,16 @@
 
 namespace App\Http\Requests\Api\V1\Auth\User;
 
-use App\Helpers\ApiResponse;
+use App\Http\Requests\Api\V1\Base\BaseRequest;
+// use Illuminate\Contracts\Validation\Validator;
+// use Illuminate\Http\Exceptions\HttpResponseException;
+
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateProfileRequest extends FormRequest
+
+// class UpdateProfileRequest extends FormRequest
+class UpdateProfileRequest extends BaseRequest
 {
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            ApiResponse::validationError(errors: $validator->errors())
-        );
-    }
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,10 +22,7 @@ class UpdateProfileRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-
     // The prefix +967 is the country code of Yemen.
     public function rules(): array
     {
@@ -38,6 +30,15 @@ class UpdateProfileRequest extends FormRequest
             'name' => ['sometimes', 'string', 'min:3', 'max:40'],
             //         // التحقق من صحة رقم الجوال بالصيغة المطلوبة ان يبدا ب "+967" ويتكون من 9 أرقام
             // 'phone' => ['nullable', 'string', 'min:13', 'max:13', 'regex:/^\+967\d{9}$/', 'unique:users,phone,' . auth('user')->id()],
+            // 'phone' => [
+            //     'sometimes',
+            //     'string',
+            //     'min:13',
+            //     'max:13',
+            //     'regex:/^\+967\d{9}$/',
+            //     //         // السماح بالمستخدم الحالي نفسه بالاحتفاظ بالرقم
+            //     'unique:users,phone,' . auth('user')->id(),
+            // ],
             'phone' => [
                 'sometimes',
                 'string',
