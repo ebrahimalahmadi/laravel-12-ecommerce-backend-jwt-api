@@ -23,9 +23,8 @@ class AdminResource extends JsonResource
             'avatar' => $this->avatar
                 ? url('uploads/admins/' . $this->avatar)
                 : url('uploads/admins/avatar.jpg'),
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
-            // 'guard' => 'admin',
+            'created_at' => $this->created_at->format('Y-m-d H:i'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i'),
         ];
     }
 }
